@@ -7,6 +7,7 @@ import { LoginComponent } from './features/auth/login.component';
 import { TechListComponent } from './features/tech/tech-list.component';
 import { TechAddComponent } from './features/tech/tech-add.component';
 import { OrderComponent } from './features/order/order.component';
+import { RegisterComponent } from './features/auth/register.component';
 
 import { techItemsResolver } from './core/tech-items.resolver';
 
@@ -21,6 +22,10 @@ export const routes: Routes = [
   {
     path: 'login',
     component: LoginComponent,
+  },
+  {
+    path: 'register',
+    component: RegisterComponent,
   },
   {
     path: 'tech',

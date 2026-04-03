@@ -20,12 +20,12 @@ router.post(
     const { username, password } = req.body;
 
     const exists = await User.findOne({ username });
-    if (exists) return res.status(409).json({ message: "User already exists" });
+    if (exists) return res.status(409).json({ message: "Ez a felhasználónév már létezik." });
 
     const passwordHash = await bcrypt.hash(password, 10);
     await User.create({ username, passwordHash });
 
-    return res.status(201).json({ message: "Registered" });
+    return res.status(201).json({ message: "Sikeres regisztráció" });
   }
 );
 
