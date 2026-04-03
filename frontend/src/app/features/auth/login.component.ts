@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { NgIf } from '@angular/common';
 
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -17,6 +18,7 @@ import { AuthService } from '../../core/auth.service';
   standalone: true,
   imports: [
     ReactiveFormsModule,
+    RouterLink,
     NgIf,
     MatCardModule,
     MatButtonModule,
@@ -28,6 +30,7 @@ import { AuthService } from '../../core/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
 })
+
 export class LoginComponent {
   private fb = inject(FormBuilder);
   private auth = inject(AuthService);

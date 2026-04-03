@@ -26,6 +26,7 @@
 
     <div class="nav-actions">
       <a mat-button routerLink="/login" routerLinkActive="active-link" *ngIf="!auth.isLoggedIn()">Belépés</a>
+      <a mat-button routerLink="/register" routerLinkActive="active-link" *ngIf="!auth.isLoggedIn()">Regisztráció</a>
       <button mat-button type="button" class="theme-btn" (click)="toggleTheme()" *ngIf="auth.isLoggedIn()" title="Téma váltása">{{ themeIcon }}</button>
       <button mat-button (click)="logout()" *ngIf="auth.isLoggedIn()">Kilépés</button>
     </div>
