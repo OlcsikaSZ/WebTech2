@@ -1,0 +1,39 @@
+<header class="hero-strip" *ngIf="auth.isLoggedIn()">
+  <div class="container hero-strip-inner">
+    <div>
+      <div class="hero-title">TechNyilvántartó</div>
+      <div class="tagline">Minden IT eszköz egy helyen, rendben.</div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <span></span><span></span>
+    </div>
+  </div>
+</header>
+
+<mat-toolbar class="topbar">
+  <div class="container nav-shell">
+    <div class="brand">
+      <span class="logo" aria-hidden="true"></span>
+      <span>TechNyilvántartó</span>
+    </div>
+
+    <nav class="nav-links" *ngIf="auth.isLoggedIn()">
+      <a mat-button routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Kezdőlap</a>
+      <a mat-button routerLink="/order" routerLinkActive="active-link">Megrendelés</a>
+      <a mat-button routerLink="/tech" routerLinkActive="active-link">IT termékek</a>
+      <a mat-button routerLink="/tech/new" routerLinkActive="active-link" class="nav-cta">Új tétel</a>
+    </nav>
+
+    <div class="nav-actions">
+      <a mat-button routerLink="/login" routerLinkActive="active-link" *ngIf="!auth.isLoggedIn()">Belépés</a>
+      <button mat-button type="button" class="theme-btn" (click)="toggleTheme()" *ngIf="auth.isLoggedIn()" title="Téma váltása">{{ themeIcon }}</button>
+      <button mat-button (click)="logout()" *ngIf="auth.isLoggedIn()">Kilépés</button>
+    </div>
+  </div>
+</mat-toolbar>
+
+<div class="page">
+  <div class="container">
+    <router-outlet></router-outlet>
+  </div>
+</div>

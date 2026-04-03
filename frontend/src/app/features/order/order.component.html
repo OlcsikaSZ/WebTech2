@@ -1,0 +1,97 @@
+<section class="page-title-row">
+  <div>
+    <h1>Megrendelés</h1>
+    <p class="muted">Válaszd ki a termékeket és a mennyiséget, add meg a szállítási adatokat, majd küldd el a rendelést.</p>
+  </div>
+</section>
+
+<section class="order-layout">
+  <div class="left-col">
+    <mat-card class="card order-table-card">
+      <div class="panel-head">
+        <h2>Termékek</h2>
+        <button class="ghost-btn" type="button">Mutatás</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Név</th><th>Kategória</th><th>Ár</th><th>Készlet</th><th>Szín</th><th>Dátum</th><th>Kosár</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let item of items">
+              <td>{{ item._id?.slice(-4) || '-' }}</td>
+              <td>
+                <div class="name-cell">{{ item.name }}</div>
+                <div class="subline" *ngIf="item.tags?.length">{{ item.tags?.join(', ') }}</div>
+              </td>
+              <td>{{ item.category }}</td>
+              <td>{{ item.priceGross | currency:'HUF':'symbol':'1.0-0':'hu' }}</td>
+              <td>{{ item.quantity }}</td>
+              <td><span class="swatch" [style.background]="item.color || '#111827'"></span> {{ item.color || '-' }}</td>
+              <td>{{ item.date || '-' }}</td>
+              <td>
+                <div class="cart-actions">
+                  <input class="qty-input" type="number" min="1" [(ngModel)]="quantities[item._id || item.sku]">
+                  <button class="add-btn" type="button" (click)="addToCart(item)">Kosárba</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </mat-card>
+
+    <mat-card class="card cart-card">
+      <div class="panel-head">
+        <h2>Kosár</h2>
+        <button class="ghost-btn" type="button" (click)="clearCart()">Kosár ürítése</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Név</th><th>Egységár</th><th>Menny.</th><th>Összesen</th><th>Művelet</th></tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of cart; let i = index">
+              <td>{{ i + 1 }}</td>
+              <td>{{ row.item.name }}</td>
+              <td>{{ row.item.priceGross | currency:'HUF':'symbol':'1.0-0':'hu' }}</td>
+              <td>{{ row.qty }}</td>
+              <td>{{ row.item.priceGross * row.qty | currency:'HUF':'symbol':'1.0-0':'hu' }}</td>
+              <td><button class="ghost-btn" type="button" (click)="removeFromCart(row.item)">Törlés</button></td>
+            </tr>
+            <tr *ngIf="cart.length === 0"><td colspan="6" class="empty-row">A kosár üres.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </mat-card>
+  </div>
+
+  <div class="right-col">
+    <mat-card class="card form-box">
+      <h2>Vevő / Szállítás</h2>
+      <div class="form-grid">
+        <div class="field"><label>Teljes név</label><input class="ui-input" placeholder="Vezetéknév Keresztnév"></div>
+        <div class="field"><label>Email</label><input class="ui-input" placeholder="nev@example.com"></div>
+        <div class="field"><label>Telefon</label><input class="ui-input" placeholder="+36..."></div>
+        <div class="field"><label>Cím</label><input class="ui-input" placeholder="Irányítószám, Város, Utca"></div>
+        <div class="field inline-two">
+          <div><label>Szállítás</label><select class="ui-input"><option>Személyes</option><option>Futár</option></select></div>
+          <div><label>Fizetés</label><select class="ui-input"><option>Utánvét</option><option>Átutalás</option></select></div>
+        </div>
+        <div class="field"><label>Megjegyzés</label><textarea class="ui-input ui-textarea" placeholder="Egyéb információ a rendeléshez..."></textarea></div>
+      </div>
+    </mat-card>
+
+    <mat-card class="card summary-box">
+      <h2>Összegzés</h2>
+      <div class="sum-row"><span>Kosár részösszeg:</span><strong>{{ subtotal | currency:'HUF':'symbol':'1.0-0':'hu' }}</strong></div>
+      <div class="sum-row"><span>Szállítás:</span><strong>{{ shipping | currency:'HUF':'symbol':'1.0-0':'hu' }}</strong></div>
+      <div class="sum-row"><span>ÁFA információ:</span><strong>Bruttó árak</strong></div>
+      <div class="sum-row total"><span>Fizetendő összesen:</span><strong>{{ grandTotal | currency:'HUF':'symbol':'1.0-0':'hu' }}</strong></div>
+      <button class="submit-btn" type="button">Rendelés leadása</button>
+    </mat-card>
+  </div>
+</section>

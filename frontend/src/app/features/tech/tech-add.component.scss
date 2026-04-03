@@ -1,0 +1,15 @@
+.page-title-row { margin: 1.4rem 0 1rem; }
+.page-title-row h1 { font-size: clamp(2rem, 3vw, 2.6rem); margin-bottom: .35rem; }
+.form-shell { padding: 1rem; }
+.custom-form { display:grid; gap: 1rem; }
+.form-section h2 { margin-bottom: .85rem; }
+.grid-two { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.field { display:grid; gap:.45rem; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-weight:700; }
+.ui-textarea { min-height: 110px; resize: vertical; }
+.choice-row, .checkbox-row { display:flex; gap:1rem; flex-wrap:wrap; align-items:center; }
+.choice-row label, .checkbox-row label { color: var(--ink); }
+.error { color: #f87171; font-size: .9rem; }
+.end { justify-content:flex-end; }
+@media (max-width: 860px) { .grid-two { grid-template-columns: 1fr; } }

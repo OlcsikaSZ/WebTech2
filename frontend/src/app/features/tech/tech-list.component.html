@@ -1,0 +1,136 @@
+<section class="page-title-row">
+  <div>
+    <h1>IT termékek</h1>
+    <p class="muted">Gyors keresés + kategória szűrés a mintaprojekt hangulatában.</p>
+  </div>
+</section>
+
+<section class="kpi-grid">
+  <mat-card class="card metric">
+    <div class="num">{{ filteredItems.length }}</div>
+    <div class="label">Termék</div>
+  </mat-card>
+
+  <mat-card class="card metric">
+    <div class="num">{{ totalValue | currency:'HUF':'symbol':'1.0-0':'hu' }}</div>
+    <div class="label">Összérték (Ft)</div>
+  </mat-card>
+
+  <mat-card class="card metric">
+    <div class="num">{{ lowCount }}</div>
+    <div class="label">Fogytán</div>
+  </mat-card>
+</section>
+
+<mat-card class="card filters-panel">
+  <div class="filters-header">
+    <h2>Szűrők</h2>
+    <button type="button" class="mini-link" (click)="clearFilters()">Szűrők törlése</button>
+  </div>
+
+  <div class="filters-toolbar">
+    <button
+      type="button"
+      class="filter-chip"
+      [class.active]="selectedCategories.length === 0"
+      (click)="selectedCategories = []; applyFilters()"
+    >
+      Összes
+    </button>
+
+    <button
+      type="button"
+      class="filter-chip"
+      *ngFor="let cat of categories"
+      [class.active]="isCategoryActive(cat)"
+      (click)="toggleCategory(cat)"
+    >
+      {{ cat }}
+    </button>
+  </div>
+
+  <div class="filters-grid">
+    <div class="field col-12">
+      <label for="q">Keresés (név, kategória, SKU...)</label>
+      <input id="q" class="ui-input" type="text" [formControl]="search" placeholder="Pl. egér, periféria, RTX...">
+    </div>
+
+    <div class="field col-6">
+      <label>Ár (bruttó, Ft)</label>
+      <div class="minmax">
+        <input class="ui-input" type="number" [formControl]="priceMin" placeholder="Min">
+        <span class="sep">–</span>
+        <input class="ui-input" type="number" [formControl]="priceMax" placeholder="Max">
+      </div>
+    </div>
+
+    <div class="field col-6">
+      <label>Mennyiség</label>
+      <div class="minmax">
+        <input class="ui-input" type="number" [formControl]="qtyMin" placeholder="Min">
+        <span class="sep">–</span>
+        <input class="ui-input" type="number" [formControl]="qtyMax" placeholder="Max">
+      </div>
+    </div>
+
+    <div class="field col-6">
+      <label>Dátum intervallum</label>
+      <div class="minmax">
+        <input class="ui-input" type="date" [formControl]="dateFrom">
+        <span class="sep">→</span>
+        <input class="ui-input" type="date" [formControl]="dateTo">
+      </div>
+    </div>
+
+    <div class="field col-6">
+      <label>SKU / Cikkszám tartalmazza</label>
+      <input class="ui-input" type="text" [formControl]="skuContains" placeholder="Pl. RTX4070">
+    </div>
+
+    <div class="field col-6">
+      <label>Címkék (vesszővel, bármelyik)</label>
+      <input class="ui-input" type="text" [formControl]="tagText" placeholder="pl.: új, akciós, NVIDIA">
+    </div>
+
+    <div class="field col-6">
+      <label>Szín (HEX részlet)</label>
+      <input class="ui-input" type="text" [formControl]="colorText" placeholder="#16a">
+    </div>
+  </div>
+</mat-card>
+
+<mat-card class="card table-card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Név</th>
+          <th>Kategória</th>
+          <th>SKU</th>
+          <th>Bruttó (Ft)</th>
+          <th>Készlet</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="loading">
+          <td colspan="5" class="empty-row">Betöltés...</td>
+        </tr>
+
+        <tr *ngFor="let item of filteredItems">
+          <td>
+            <div class="name-cell">{{ item.name }}</div>
+            <div class="subline" *ngIf="item.tags?.length">{{ item.tags?.join(', ') }}</div>
+          </td>
+          <td>{{ item.category }}</td>
+          <td>{{ item.sku }}</td>
+          <td>{{ item.priceGross | currency:'HUF':'symbol':'1.0-0':'hu' }}</td>
+          <td>{{ item.quantity }}</td>
+        </tr>
+
+        <tr *ngIf="!loading && filteredItems.length === 0">
+          <td colspan="5" class="empty-row">Nincs találat. Próbálj másik keresést vagy szűrést.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</mat-card>

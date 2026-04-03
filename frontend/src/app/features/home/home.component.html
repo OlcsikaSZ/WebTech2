@@ -1,0 +1,85 @@
+<section class="hero-grid">
+  <mat-card class="card hero-copy">
+    <h1>Informatikai terméknyilvántartó</h1>
+    <p class="muted lead">
+      Egy modern, moduláris rendszer kifejezetten <strong>IT eszközök</strong> kezeléséhez:
+      notebookok, GPU-k, CPU-k, tárolók és perifériák. Reszponzív felület, gyors szűrés,
+      és barátságos űrlapvalidáció.
+    </p>
+
+    <div class="chips" aria-label="Kiemelt kategóriák">
+      <span class="chip" *ngFor="let chip of chips" [attr.data-kind]="chip.kind">{{ chip.label }}</span>
+    </div>
+
+    <ul class="feature-list">
+      <li>Listázás és keresés specifikusan IT termékekre</li>
+      <li>Új tétel felvitele validációval</li>
+      <li>MongoDB alapú adattárolás és gyors API</li>
+      <li>Letisztult, tech-hangulatú UI</li>
+    </ul>
+
+    <div class="actions-row">
+      <a class="ui-btn" routerLink="/tech">Termékek megtekintése</a>
+      <a class="ui-btn ghost" routerLink="/tech/new">Új IT termék</a>
+      <span class="status-pill"><span class="dot"></span> stabil</span>
+    </div>
+  </mat-card>
+
+  <mat-card class="card hero-video">
+    <div class="video-shell"></div>
+    <div class="video-controls">
+      <button type="button" class="icon-btn">▶</button>
+      <button type="button" class="icon-btn ghost">🔇</button>
+      <div class="range"></div>
+      <div class="time">0:00 / 0:34</div>
+      <button type="button" class="icon-btn ghost wide">0.75x</button>
+      <button type="button" class="icon-btn ghost wide">1.25x</button>
+      <button type="button" class="icon-btn ghost">↻</button>
+    </div>
+  </mat-card>
+</section>
+
+<section class="metrics-grid">
+  <mat-card class="card metric">
+    <div class="num">{{ items().length }}</div>
+    <div class="label">Összes IT tétel</div>
+  </mat-card>
+  <mat-card class="card metric">
+    <div class="num">{{ totalQty() }}</div>
+    <div class="label">Raktáron</div>
+  </mat-card>
+  <mat-card class="card metric">
+    <div class="num">{{ totalValue() | currency:'HUF':'symbol':'1.0-0':'hu' }}</div>
+    <div class="label">Készletérték (bruttó)</div>
+  </mat-card>
+</section>
+
+<section class="mini-grid">
+  <mat-card class="card info-box">
+    <h3>HTML elemek</h3>
+    <p>Használt tag-ek: div, span, p, címsorok, képek, táblázat, linkek, űrlap elemek, listák.</p>
+  </mat-card>
+  <mat-card class="card info-box">
+    <h3>CSS formázások</h3>
+    <p>Külső CSS, sötét, tech-es design, üveg-szerű panelek, chipek, animált hoverek.</p>
+  </mat-card>
+  <mat-card class="card info-box">
+    <h3>Angular + Material</h3>
+    <p>Űrlap ellenőrzés, táblázat, szűrés, route-ok és API integráció egy modernebb köntösben.</p>
+  </mat-card>
+</section>
+
+<mat-card class="card sample-table">
+  <h3>Minta táblázat</h3>
+  <table>
+    <thead>
+      <tr><th>#</th><th>Modell</th><th>Kategória</th></tr>
+    </thead>
+    <tbody>
+      <tr *ngIf="items().length === 0"><td>1</td><td>NVIDIA GeForce RTX 4070</td><td>GPU</td></tr>
+      <tr *ngIf="items().length === 0"><td>2</td><td>AMD Ryzen 7 7800X3D</td><td>CPU</td></tr>
+      <tr *ngFor="let item of items().slice(0, 5); let i = index"><td>{{ i + 1 }}</td><td>{{ item.name }}</td><td>{{ item.category }}</td></tr>
+    </tbody>
+  </table>
+  <div class="footer-note">Készítette: Gál Olivér István (ISXBF3) · Angular + Material változat</div>
+</mat-card>

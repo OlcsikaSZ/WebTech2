@@ -1,0 +1,25 @@
+<mat-card class="card">
+  <h2>Belépés</h2>
+
+  <form [formGroup]="form" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Felhasználónév</mat-label>
+      <input matInput formControlName="username" />
+      <mat-error *ngIf="form.controls.username.invalid">Kötelező</mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full">
+      <mat-label>Jelszó</mat-label>
+      <input matInput type="password" formControlName="password" />
+      <mat-error *ngIf="form.controls.password.invalid">Kötelező</mat-error>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" class="full" [disabled]="loading || form.invalid">
+      {{ loading ? 'Beléptetünk…' : 'Belépés' }}
+    </button>
+  </form>
+
+  <p class="hint">
+    Tipp: csinálj egy felhasználót a backend `/api/auth/register` végponttal (dev).
+  </p>
+</mat-card>

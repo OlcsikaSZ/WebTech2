@@ -1,0 +1,120 @@
+<section class="page-title-row">
+  <div>
+    <h1>Új IT termék hozzáadása</h1>
+    <p class="muted">A korábbi beadandó struktúrájához igazított, részletesebb űrlap.</p>
+  </div>
+</section>
+
+<mat-card class="card form-shell">
+  <form [formGroup]="form" (ngSubmit)="submit()" class="custom-form">
+    <section class="form-section">
+      <h2>Alapadatok</h2>
+      <div class="grid-two">
+        <div class="field">
+          <label>Modell / Név*</label>
+          <input class="ui-input" formControlName="name" placeholder="Pl. NVIDIA GeForce RTX 4070">
+          <div class="error" *ngIf="form.controls.name.touched && form.controls.name.invalid">Kötelező (min. 2 karakter).</div>
+        </div>
+        <div class="field">
+          <label>Kategória*</label>
+          <input class="ui-input" formControlName="category" placeholder="Pl. GPU">
+        </div>
+        <div class="field full">
+          <label>Gyártó</label>
+          <input class="ui-input" formControlName="brand" list="brandList" placeholder="Pl. Logitech">
+          <datalist id="brandList">
+            <option value="Apple"></option><option value="Samsung"></option><option value="Logitech"></option><option value="Dell"></option><option value="HP"></option>
+          </datalist>
+        </div>
+        <div class="field full">
+          <label>Leírás</label>
+          <textarea class="ui-input ui-textarea" formControlName="description" placeholder="Rövid leírás a termékről..."></textarea>
+        </div>
+        <div class="field">
+          <label>SKU / Cikkszám*</label>
+          <input class="ui-input" formControlName="sku" placeholder="Pl. RTX4070-ASUS-12G">
+        </div>
+        <div class="field">
+          <label>Raktárhely</label>
+          <input class="ui-input" formControlName="location" placeholder="A3-Polc2-Rekesz5">
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="grid-two">
+        <div class="field">
+          <label>Termék állapota</label>
+          <div class="choice-row">
+            <label><input type="radio" formControlName="condition" value="uj"> Új</label>
+            <label><input type="radio" formControlName="condition" value="hasznalt"> Használt</label>
+          </div>
+        </div>
+        <div class="field"></div>
+        <div class="field">
+          <label>Értékesítési státusz</label>
+          <select class="ui-input" formControlName="status"><option>Aktív</option><option>Kifutó</option><option>Sérült</option></select>
+        </div>
+        <div class="field">
+          <label>Minimum készlet (riasztás)</label>
+          <input class="ui-input" type="number" formControlName="reorder">
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="grid-two">
+        <div class="field">
+          <label>Beszerzési ár (nettó, Ft)*</label>
+          <input class="ui-input" type="number" formControlName="priceNet" (input)="recalc('net')" placeholder="Pl. 210000">
+        </div>
+        <div class="field">
+          <label>ÁFA %*</label>
+          <input class="ui-input" type="number" formControlName="vat">
+        </div>
+        <div class="field">
+          <label>Eladási ár (bruttó, Ft)*</label>
+          <input class="ui-input" type="number" formControlName="priceGross" (input)="recalc('gross')" placeholder="Bruttó ár">
+        </div>
+        <div class="field">
+          <label>Mennyiség*</label>
+          <input class="ui-input" type="number" formControlName="quantity">
+        </div>
+        <div class="field">
+          <label>Garancia (hónap)</label>
+          <input class="ui-input" type="number" formControlName="warrantyMonths">
+        </div>
+        <div class="field">
+          <label>Beszerzés dátuma</label>
+          <input class="ui-input" type="date" formControlName="date">
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="grid-two">
+        <div class="field full">
+          <label>Kép URL (opcionális)</label>
+          <input class="ui-input" formControlName="imageUrl" placeholder="https://...">
+        </div>
+        <div class="field">
+          <label>Szín (HEX)</label>
+          <input class="ui-input" formControlName="color" placeholder="#2563eb">
+        </div>
+      </div>
+    </section>
+
+    <section class="form-section">
+      <div class="field">
+        <label>Címkék</label>
+        <div class="checkbox-row">
+          <label *ngFor="let tag of allTags"><input type="checkbox" [checked]="form.controls.tags.value.includes(tag)" (change)="toggleTag(tag, $any($event.target).checked)"> {{ tag }}</label>
+        </div>
+      </div>
+    </section>
+
+    <div class="actions-row end">
+      <button class="ui-btn" type="submit">Mentés</button>
+    </div>
+  </form>
+</mat-card>
