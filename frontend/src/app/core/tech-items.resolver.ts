@@ -7,6 +7,9 @@ export const techItemsResolver: ResolveFn<TechItem[]> = () => {
   const tech = inject(TechService);
 
   return tech.list().pipe(
-    catchError(() => of([]))
+    catchError((err) => {
+      console.error('Hiba a termékek betöltésekor:', err);
+      return of([]);
+    })
   );
 };

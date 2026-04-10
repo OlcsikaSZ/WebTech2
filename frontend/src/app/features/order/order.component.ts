@@ -1,7 +1,8 @@
-import { Component, ChangeDetectorRef, inject, NgZone, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { NgFor, NgIf, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { TechItem } from '../../core/tech.service';
 
@@ -15,7 +16,7 @@ import { TechItem } from '../../core/tech.service';
 export class OrderComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
-  private zone = inject(NgZone);
+  private destroyRef = inject(DestroyRef);
 
   loading = true;
 
@@ -26,22 +27,24 @@ export class OrderComponent implements OnInit {
   shipping = 0;
 
   ngOnInit(): void {
-    this.route.data.subscribe((data) => {
-      this.zone.run(() => {
-        this.loading = true;
+    this.setItems((this.route.snapshot.data['items'] ?? []) as TechItem[]);
 
-        const items = (data['items'] ?? []) as TechItem[];
-        this.items = items;
-        this.quantities = {};
-
-        for (const item of items) {
-          this.quantities[item._id || item.sku] = 1;
-        }
-
+    this.route.data
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        this.setItems((data['items'] ?? []) as TechItem[]);
         this.loading = false;
         this.cdr.detectChanges();
       });
-    });
+  }
+
+  private setItems(items: TechItem[]): void {
+    this.items = items;
+    this.quantities = {};
+
+    for (const item of items) {
+      this.quantities[item._id || item.sku] = 1;
+    }
   }
 
   addToCart(item: TechItem) {
@@ -54,19 +57,15 @@ export class OrderComponent implements OnInit {
     } else {
       this.cart = [...this.cart, { item, qty }];
     }
-
-    this.cdr.detectChanges();
   }
 
   removeFromCart(item: TechItem) {
     const key = item._id || item.sku;
     this.cart = this.cart.filter((x) => (x.item._id || x.item.sku) !== key);
-    this.cdr.detectChanges();
   }
 
   clearCart() {
     this.cart = [];
-    this.cdr.detectChanges();
   }
 
   get subtotal(): number {

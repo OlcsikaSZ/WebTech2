@@ -1,7 +1,7 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { NgFor, NgIf, CurrencyPipe } from '@angular/common';
-import { RouterLink } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { TechItem } from '../../core/tech.service';
 
@@ -14,6 +14,8 @@ import { TechItem } from '../../core/tech.service';
 })
 export class HomeComponent {
   private route = inject(ActivatedRoute);
+  private cdr = inject(ChangeDetectorRef);
+  private destroyRef = inject(DestroyRef);
 
   chips = [
     { label: 'Laptopok', kind: 'laptop' },
@@ -23,12 +25,15 @@ export class HomeComponent {
     { label: 'Perifériák', kind: 'peripheral' },
   ];
 
-  items = signal<TechItem[]>(this.route.snapshot.data['items'] ?? []);
+  items = signal<TechItem[]>((this.route.snapshot.data['items'] ?? []) as TechItem[]);
 
   constructor() {
-    this.route.data.subscribe((data) => {
-      this.items.set(data['items'] ?? []);
-    });
+    this.route.data
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        this.items.set((data['items'] ?? []) as TechItem[]);
+        this.cdr.detectChanges();
+      });
   }
 
   totalQty = computed(() =>

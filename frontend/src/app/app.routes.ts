@@ -17,7 +17,6 @@ export const routes: Routes = [
     component: HomeComponent,
     canActivate: [authGuard],
     resolve: { items: techItemsResolver },
-    runGuardsAndResolvers: 'always',
   },
   {
     path: 'login',
@@ -32,7 +31,6 @@ export const routes: Routes = [
     component: TechListComponent,
     canActivate: [authGuard],
     resolve: { items: techItemsResolver },
-    runGuardsAndResolvers: 'always',
   },
   {
     path: 'tech/new',
@@ -44,7 +42,6 @@ export const routes: Routes = [
     component: OrderComponent,
     canActivate: [authGuard],
     resolve: { items: techItemsResolver },
-    runGuardsAndResolvers: 'always',
   },
   {
     path: '**',

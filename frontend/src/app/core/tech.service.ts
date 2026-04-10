@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable, shareReplay, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 export interface TechItem {
@@ -26,13 +27,29 @@ export interface TechItem {
 
 @Injectable({ providedIn: 'root' })
 export class TechService {
+  private itemsCache$?: Observable<TechItem[]>;
+
   constructor(private http: HttpClient) {}
 
-  list() {
-    return this.http.get<TechItem[]>(`${environment.apiBaseUrl}/tech`);
+  list(forceRefresh = false): Observable<TechItem[]> {
+    if (!this.itemsCache$ || forceRefresh) {
+      this.itemsCache$ = this.http
+        .get<TechItem[]>(`${environment.apiBaseUrl}/tech`)
+        .pipe(shareReplay(1));
+    }
+
+    return this.itemsCache$;
+  }
+
+  clearCache(): void {
+    this.itemsCache$ = undefined;
   }
 
   create(item: TechItem) {
-    return this.http.post<TechItem>(`${environment.apiBaseUrl}/tech`, item);
+    return this.http
+      .post<TechItem>(`${environment.apiBaseUrl}/tech`, item)
+      .pipe(
+        tap(() => this.clearCache())
+      );
   }
 }

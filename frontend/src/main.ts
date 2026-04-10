@@ -3,23 +3,22 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
-import { provideZoneChangeDetection } from '@angular/core';
-import { provideRouter, withRouterConfig } from '@angular/router';
+import { LOCALE_ID } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { registerLocaleData } from '@angular/common';
+import localeHu from '@angular/common/locales/hu';
 
 import { AppComponent } from './app/app.component';
 import { routes } from './app/app.routes';
 import { authInterceptor } from './app/core/auth.interceptor';
 
+registerLocaleData(localeHu);
+
 bootstrapApplication(AppComponent, {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: false }),
     provideAnimations(),
-    provideRouter(
-      routes,
-      withRouterConfig({
-        onSameUrlNavigation: 'reload',
-      })
-    ),
+    provideRouter(routes),
     provideHttpClient(withInterceptors([authInterceptor])),
+    { provide: LOCALE_ID, useValue: 'hu-HU' },
   ],
 }).catch((err) => console.error(err));

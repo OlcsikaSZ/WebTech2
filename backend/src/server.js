@@ -30,3 +30,8 @@ bootstrap().catch((e) => {
   console.error("Boot error:", e);
   process.exit(1);
 });
+
+app.use((err, req, res, next) => {
+  console.error('Szerver hiba:', err);
+  res.status(500).json({ message: 'Belső szerverhiba' });
+});

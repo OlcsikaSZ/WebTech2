@@ -20,6 +20,13 @@
             </tr>
           </thead>
           <tbody>
+            <tr *ngIf="loading">
+              <td colspan="8" class="empty-row">Betöltés...</td>
+            </tr>
+
+            <tr *ngIf="!loading && items.length === 0">
+              <td colspan="8" class="empty-row">Nincs megjeleníthető termék.</td>
+            </tr>
             <tr *ngFor="let item of items">
               <td>{{ item._id?.slice(-4) || '-' }}</td>
               <td>
