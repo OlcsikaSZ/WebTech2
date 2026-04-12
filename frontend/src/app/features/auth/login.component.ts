@@ -53,7 +53,12 @@ export class LoginComponent {
       next: (res) => {
         this.auth.setToken(res.token);
         this.snack.open('Sikeres belépés', 'OK', { duration: 1800 });
-        this.router.navigate(['/tech']);
+
+        if (this.auth.isAdmin()) {
+          this.router.navigate(['/tech']);
+        } else {
+          this.router.navigate(['/']);
+        }
       },
       error: (err) => {
         const msg = err?.error?.message || 'Sikertelen belépés';

@@ -19,8 +19,9 @@
     </ul>
 
     <div class="actions-row">
-      <a class="ui-btn" routerLink="/tech">Termékek megtekintése</a>
-      <a class="ui-btn ghost" routerLink="/tech/new">Új IT termék</a>
+      <a class="ui-btn" routerLink="/order">Rendelés indítása</a>
+      <a class="ui-btn ghost" routerLink="/tech" *ngIf="auth.isAdmin()">Termékek megtekintése</a>
+      <a class="ui-btn ghost" routerLink="/tech/new" *ngIf="auth.isAdmin()">Új IT termék</a>
       <span class="status-pill"><span class="dot"></span> stabil</span>
     </div>
   </mat-card>

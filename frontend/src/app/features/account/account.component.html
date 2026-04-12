@@ -1,0 +1,115 @@
+<section class="page-title-row">
+  <div>
+    <h1>Fiókom</h1>
+    <p class="muted">
+      Saját fiókadatok és jogosultságok kezelése.
+    </p>
+  </div>
+</section>
+
+<mat-card class="card" *ngIf="loading">
+  Betöltés...
+</mat-card>
+
+<ng-container *ngIf="!loading && me">
+  <section class="account-grid">
+    <mat-card class="card">
+      <h2>Saját adataim</h2>
+
+      <div class="info-row">
+        <span class="label">Felhasználónév</span>
+        <span class="value">{{ me.username }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Jogosultság</span>
+        <span class="value badge" [class.admin]="me.role === 'admin'" [class.buyer]="me.role === 'buyer'">
+          {{ me.role === 'admin' ? 'Admin' : 'Vásárló' }}
+        </span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Regisztráció</span>
+        <span class="value">{{ me.createdAt | date:'yyyy.MM.dd. HH:mm' }}</span>
+      </div>
+
+      <div class="info-row">
+        <span class="label">Utolsó módosítás</span>
+        <span class="value">{{ me.updatedAt | date:'yyyy.MM.dd. HH:mm' }}</span>
+      </div>
+    </mat-card>
+
+    <mat-card class="card" *ngIf="isAdmin">
+      <h2>Admin nézet</h2>
+      <p class="muted">
+        Itt látod az összes regisztrált felhasználót, és tudod módosítani a jogosultságukat vagy törölni őket.
+      </p>
+    </mat-card>
+  </section>
+
+  <mat-card class="card" *ngIf="isAdmin">
+    <div class="users-header">
+      <h2>Regisztrált fiókok</h2>
+      <button mat-stroked-button type="button" (click)="loadUsers()">Frissítés</button>
+    </div>
+
+    <div *ngIf="usersLoading" class="muted">Felhasználók betöltése...</div>
+
+    <div class="table-wrap" *ngIf="!usersLoading">
+      <table>
+        <thead>
+          <tr>
+            <th>Felhasználónév</th>
+            <th>Szerep</th>
+            <th>Létrehozva</th>
+            <th>Műveletek</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ user.username }}</td>
+            <td>
+              <span class="badge" [class.admin]="user.role === 'admin'" [class.buyer]="user.role === 'buyer'">
+                {{ user.role === 'admin' ? 'Admin' : 'Vásárló' }}
+              </span>
+            </td>
+            <td>{{ user.createdAt | date:'yyyy.MM.dd. HH:mm' }}</td>
+            <td class="actions">
+              <button
+                mat-stroked-button
+                type="button"
+                *ngIf="user.role !== 'admin'"
+                (click)="changeRole(user, 'admin')"
+              >
+                Adminná tesz
+              </button>
+
+              <button
+                mat-stroked-button
+                type="button"
+                *ngIf="user.role !== 'buyer'"
+                (click)="changeRole(user, 'buyer')"
+              >
+                Vásárlóvá tesz
+              </button>
+
+              <button
+                mat-raised-button
+                color="warn"
+                type="button"
+                [disabled]="me?._id === user._id"
+                (click)="deleteUser(user)"
+              >
+                Törlés
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="users.length === 0">
+            <td colspan="4" class="empty-row">Nincs még más regisztrált felhasználó.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </mat-card>
+</ng-container>

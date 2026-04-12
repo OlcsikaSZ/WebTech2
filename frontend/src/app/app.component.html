@@ -20,14 +20,51 @@
     <nav class="nav-links" *ngIf="auth.isLoggedIn()">
       <a mat-button routerLink="/" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }">Kezdőlap</a>
       <a mat-button routerLink="/order" routerLinkActive="active-link">Megrendelés</a>
-      <a mat-button routerLink="/tech" routerLinkActive="active-link">IT termékek</a>
-      <a mat-button routerLink="/tech/new" routerLinkActive="active-link" class="nav-cta">Új tétel</a>
+
+      <a
+        mat-button
+        routerLink="/tech"
+        routerLinkActive="active-link"
+        *ngIf="auth.isAdmin()"
+      >
+        IT termékek
+      </a>
+
+      <a
+        mat-button
+        routerLink="/tech/new"
+        routerLinkActive="active-link"
+        class="nav-cta"
+        *ngIf="auth.isAdmin()"
+      >
+        Új tétel
+      </a>
     </nav>
 
     <div class="nav-actions">
       <a mat-button routerLink="/login" routerLinkActive="active-link" *ngIf="!auth.isLoggedIn()">Belépés</a>
       <a mat-button routerLink="/register" routerLinkActive="active-link" *ngIf="!auth.isLoggedIn()">Regisztráció</a>
-      <button mat-button type="button" class="theme-btn" (click)="toggleTheme()" *ngIf="auth.isLoggedIn()" title="Téma váltása">{{ themeIcon }}</button>
+
+      <button
+        mat-button
+        type="button"
+        class="theme-btn"
+        (click)="toggleTheme()"
+        *ngIf="auth.isLoggedIn()"
+        title="Téma váltása"
+      >
+        {{ themeIcon }}
+      </button>
+
+      <a
+        mat-button
+        routerLink="/account"
+        routerLinkActive="active-link"
+        *ngIf="auth.isLoggedIn()"
+      >
+        Fiókom
+      </a>
+
       <button mat-button (click)="logout()" *ngIf="auth.isLoggedIn()">Kilépés</button>
     </div>
   </div>
