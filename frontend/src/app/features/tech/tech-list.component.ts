@@ -130,9 +130,9 @@ export class TechListComponent implements OnInit {
   }
 
   get lowCount(): number {
-    return this.filteredItems.filter((item) => Number(item.quantity || 0) <= 1).length;
+    return this.filteredItems.filter((item) => this.isLowStock(item)).length;
   }
-
+  
   toggleCategory(cat: string): void {
     if (this.selectedCategories.includes(cat)) {
       this.selectedCategories = this.selectedCategories.filter((x) => x !== cat);
@@ -145,6 +145,10 @@ export class TechListComponent implements OnInit {
 
   isCategoryActive(cat: string): boolean {
     return this.selectedCategories.includes(cat);
+  }
+
+  isLowStock(item: TechItem): boolean {
+    return Number(item.quantity || 0) <= Number(item.reorder || 0);
   }
 
   clearFilters(): void {

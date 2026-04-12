@@ -35,7 +35,47 @@
 .subline { color: var(--muted); font-size:.85rem; margin-top:.15rem; }
 .empty-row { text-align:left; color: var(--muted); }
 
+.stock-value.low-stock {
+  color: #f87171;
+  font-weight: 800;
+}
+
+.low-stock-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.16);
+  color: #fca5a5;
+  border: 1px solid rgba(239, 68, 68, 0.32);
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
 @media (max-width: 980px) {
   .kpi-grid { grid-template-columns:1fr; }
   .col-6 { grid-column: span 12; }
+}
+
+.grid-two {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.field {
+  min-width: 0;
+}
+
+.field.full {
+  grid-column: 1 / -1;
+}
+
+.ui-input,
+.ui-textarea,
+select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }

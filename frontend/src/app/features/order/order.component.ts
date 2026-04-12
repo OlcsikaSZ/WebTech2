@@ -107,6 +107,43 @@ export class OrderComponent implements OnInit {
     this.cart = [];
   }
 
+  get cartItemCount(): number {
+    return this.cart.reduce((sum, row) => sum + row.qty, 0);
+  }
+
+  increaseQty(row: CartRow): void {
+    const stock = Number(row.item.quantity || 0);
+    if (row.qty < stock) {
+      row.qty += 1;
+      this.cart = [...this.cart];
+      this.submitError = '';
+    } else {
+      this.submitError = `Nincs több készlet ehhez: ${row.item.name}`;
+    }
+  }
+
+  decreaseQty(row: CartRow): void {
+    if (row.qty > 1) {
+      row.qty -= 1;
+      this.cart = [...this.cart];
+    } else {
+      this.removeFromCart(row.item);
+    }
+  }
+
+  isEmailValid(): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.email.trim());
+  }
+
+  isPhoneValid(): boolean {
+    const phone = this.phone.trim().replace(/\s+/g, '');
+    return /^(\+36|06)?\d{8,9}$/.test(phone);
+  }
+
+  isRequiredInvalid(value: string): boolean {
+    return !value.trim();
+  }
+
   get shipping(): number {
     return this.shippingMethod === 'Futár' ? 1990 : 0;
   }
@@ -126,12 +163,24 @@ export class OrderComponent implements OnInit {
       this.email.trim() &&
       this.phone.trim() &&
       this.address.trim() &&
+      this.isEmailValid() &&
+      this.isPhoneValid() &&
       !this.isSubmitting
     );
   }
 
   submitOrder(): void {
     this.submitError = '';
+
+    if (!this.isEmailValid()) {
+      this.submitError = 'Kérlek adj meg érvényes email címet.';
+      return;
+    }
+
+    if (!this.isPhoneValid()) {
+      this.submitError = 'Kérlek adj meg érvényes telefonszámot.';
+      return;
+    }
 
     if (this.cart.length === 0) {
       this.submitError = 'A rendelés leadásához legalább egy terméket tegyél a kosárba.';
@@ -167,7 +216,7 @@ export class OrderComponent implements OnInit {
       next: (res: any) => {
         this.isSubmitting = false;
         this.submitSuccess = true;
-        this.createdOrderId = res?._id || '';
+        this.createdOrderId = res?.orderNumber || res?._id || '';
         this.createdAt = res?.createdAt || new Date().toISOString();
 
           this.confirmedCustomerName = this.customerName.trim();
@@ -196,12 +245,13 @@ export class OrderComponent implements OnInit {
         });
       },
       error: (err) => {
+        console.error('RENDELÉS HIBA:', err);
         this.isSubmitting = false;
         this.submitError =
           err?.error?.message ||
           err?.error?.errors?.[0]?.msg ||
           'A rendelés mentése nem sikerült.';
-      },
+      }
     });
   }
 

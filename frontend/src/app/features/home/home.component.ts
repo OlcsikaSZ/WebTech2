@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { TechItem } from '../../core/tech.service';
 import { AuthService } from '../../core/auth.service';
+import { OrderService } from '../../core/order.service';
 
 @Component({
   selector: 'app-home',
@@ -17,7 +18,11 @@ export class HomeComponent {
   private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
+  private orderService = inject(OrderService);
   auth = inject(AuthService);
+  totalOrders = signal(0);
+  totalOrderedValue = signal(0);
+  lowStockCount = signal(0);
 
   chips = [
     { label: 'Laptopok', kind: 'laptop' },
@@ -36,6 +41,17 @@ export class HomeComponent {
         this.items.set((data['items'] ?? []) as TechItem[]);
         this.cdr.detectChanges();
       });
+
+      this.orderService.dashboardStats()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (stats) => {
+            this.totalOrders.set(stats.totalOrders);
+            this.totalOrderedValue.set(stats.totalOrderValue);
+            this.lowStockCount.set(stats.lowStockCount);
+            this.cdr.detectChanges();
+          }
+        });
   }
 
   totalQty = computed(() =>

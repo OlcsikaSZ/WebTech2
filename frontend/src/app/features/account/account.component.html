@@ -39,6 +39,46 @@
       </div>
     </mat-card>
 
+    <mat-card class="card">
+        <div class="users-header">
+            <h2>Rendeléseim</h2>
+            <button mat-stroked-button type="button" (click)="loadOrders()">Frissítés</button>
+        </div>
+
+        <div *ngIf="ordersLoading" class="muted">Rendelések betöltése...</div>
+
+        <div class="table-wrap" *ngIf="!ordersLoading">
+            <table>
+            <thead>
+                <tr>
+                <th>Rendelésszám</th>
+                <th>Dátum</th>
+                <th>Státusz</th>
+                <th>Végösszeg</th>
+                <th>Művelet</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let order of orders">
+                <td>{{ order.orderNumber }}</td>
+                <td>{{ order.createdAt | date:'yyyy.MM.dd. HH:mm' }}</td>
+                <td>{{ order.status }}</td>
+                <td>{{ order.grandTotal | number:'1.0-0' }} Ft</td>
+                <td>
+                    <button mat-stroked-button type="button" (click)="openOrder(order)">
+                    Megnézem
+                    </button>
+                </td>
+                </tr>
+
+                <tr *ngIf="orders.length === 0">
+                <td colspan="5" class="empty-row">Még nincs leadott rendelésed.</td>
+                </tr>
+            </tbody>
+            </table>
+        </div>
+        </mat-card>
+
     <mat-card class="card" *ngIf="isAdmin">
       <h2>Admin nézet</h2>
       <p class="muted">
@@ -97,7 +137,7 @@
                 mat-raised-button
                 color="warn"
                 type="button"
-                [disabled]="me?._id === user._id"
+                [disabled]="me._id === user._id"
                 (click)="deleteUser(user)"
               >
                 Törlés
@@ -112,4 +152,79 @@
       </table>
     </div>
   </mat-card>
+
+  <div class="confirm-overlay" *ngIf="selectedOrder" (click)="closeOrder()">
+    <div class="confirm-modal" (click)="$event.stopPropagation()">
+        <button class="confirm-close" type="button" (click)="closeOrder()">×</button>
+
+        <div class="confirm-header">
+        <div class="confirm-icon">✓</div>
+        <div>
+            <p class="confirm-kicker">Leadott rendelés</p>
+            <h2>Rendelés részletei</h2>
+            <p class="confirm-subtext">
+            Itt újra meg tudod nézni a rendelés visszaigazolását.
+            </p>
+        </div>
+        </div>
+
+        <div class="confirm-highlight">
+        <span>Fizetendő végösszeg</span>
+        <strong>{{ selectedOrder.grandTotal | number:'1.0-0' }} Ft</strong>
+        </div>
+
+        <div class="confirm-grid fancy-grid" *ngIf="selectedOrder">
+        <div class="confirm-item">
+            <span class="label">Rendelés száma</span>
+            <strong>{{ selectedOrder.orderNumber }}</strong>
+        </div>
+
+        <div class="confirm-item">
+            <span class="label">Dátum</span>
+            <strong>{{ selectedOrder.createdAt | date:'yyyy.MM.dd HH:mm' }}</strong>
+        </div>
+
+        <div class="confirm-item">
+            <span class="label">Vevő</span>
+            <strong>{{ selectedOrder.customerName }}</strong>
+        </div>
+
+        <div class="confirm-item">
+            <span class="label">Email</span>
+            <strong>{{ selectedOrder.email }}</strong>
+        </div>
+
+        <div class="confirm-item">
+            <span class="label">Telefon</span>
+            <strong>{{ selectedOrder.phone }}</strong>
+        </div>
+
+        <div class="confirm-item">
+            <span class="label">Szállítás</span>
+            <strong>{{ selectedOrder.shippingMethod }}</strong>
+        </div>
+
+        <div class="confirm-item">
+            <span class="label">Fizetés</span>
+            <strong>{{ selectedOrder.paymentMethod }}</strong>
+        </div>
+
+        <div class="confirm-item confirm-item--wide">
+            <span class="label">Cím</span>
+            <strong>{{ selectedOrder.address }}</strong>
+        </div>
+
+        <div class="confirm-item confirm-item--wide" *ngIf="selectedOrder.note">
+            <span class="label">Megjegyzés</span>
+            <strong>{{ selectedOrder.note }}</strong>
+        </div>
+        </div>
+
+        <div class="confirm-actions">
+        <button class="submit-btn confirm-btn" type="button" (click)="closeOrder()">
+            Rendben
+        </button>
+        </div>
+    </div>
+    </div>
 </ng-container>

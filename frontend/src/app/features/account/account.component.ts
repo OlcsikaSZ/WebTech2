@@ -1,15 +1,16 @@
 import { Component, inject, OnInit, ChangeDetectorRef, DestroyRef } from '@angular/core';
-import { NgFor, NgIf, DatePipe } from '@angular/common';
+import { NgFor, NgIf, DatePipe, DecimalPipe } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthService, CurrentUser, UserRole } from '../../core/auth.service';
+import { OrderService, OrderDto } from '../../core/order.service';
 
 @Component({
   selector: 'app-account',
   standalone: true,
-  imports: [NgIf, NgFor, DatePipe, MatCardModule, MatSnackBarModule, MatButtonModule],
+  imports: [NgIf, NgFor, DatePipe, DecimalPipe, MatCardModule, MatSnackBarModule, MatButtonModule],
   templateUrl: './account.component.html',
   styleUrls: ['./account.component.scss'],
 })
@@ -18,11 +19,15 @@ export class AccountComponent implements OnInit {
   private snack = inject(MatSnackBar);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
+  private orderService = inject(OrderService);
 
   me: CurrentUser | null = null;
   users: CurrentUser[] = [];
   loading = true;
   usersLoading = false;
+  orders: OrderDto[] = [];
+  ordersLoading = false;
+  selectedOrder: OrderDto | null = null;
 
   get isAdmin(): boolean {
     return this.auth.isAdmin();
@@ -30,6 +35,7 @@ export class AccountComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadMe();
+    this.loadOrders();
 
     if (this.isAdmin) {
       this.loadUsers();
@@ -73,6 +79,33 @@ export class AccountComponent implements OnInit {
         },
       });
   }
+
+  loadOrders(): void {
+    this.ordersLoading = true;
+
+    this.orderService.mine()
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+        next: (orders) => {
+            this.orders = orders;
+            this.ordersLoading = false;
+            this.cdr.detectChanges();
+        },
+        error: () => {
+            this.ordersLoading = false;
+            this.snack.open('Nem sikerült betölteni a rendeléseket.', 'OK', { duration: 2500 });
+            this.cdr.detectChanges();
+        },
+        });
+    }
+
+    openOrder(order: OrderDto): void {
+    this.selectedOrder = order;
+    }
+
+    closeOrder(): void {
+    this.selectedOrder = null;
+    }
 
   changeRole(user: CurrentUser, role: UserRole): void {
     if (user.role === role) return;

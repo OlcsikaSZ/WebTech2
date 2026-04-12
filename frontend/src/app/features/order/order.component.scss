@@ -537,3 +537,40 @@ td:last-child {
     width: 100%;
   }
 }
+
+.cart-count {
+  color: var(--muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.qty-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.step-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.3);
+  background: rgba(255,255,255,0.04);
+  color: var(--ink);
+  font-size: 1rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.qty-pill {
+  min-width: 32px;
+  text-align: center;
+  font-weight: 700;
+}
+
+.ui-input.invalid,
+.ui-textarea.invalid,
+select.invalid {
+  border-color: rgba(239, 68, 68, 0.9) !important;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.14);
+}
