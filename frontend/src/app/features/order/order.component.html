@@ -1,7 +1,9 @@
 <section class="page-title-row">
   <div>
     <h1>Megrendelés</h1>
-    <p class="muted">Válaszd ki a termékeket és a mennyiséget, add meg a szállítási adatokat, majd küldd el a rendelést.</p>
+    <p class="muted">
+      Válaszd ki a termékeket és a mennyiséget, add meg a szállítási adatokat, majd küldd el a rendelést.
+    </p>
   </div>
 </section>
 
@@ -12,14 +14,30 @@
         <h2>Termékek</h2>
         <button class="ghost-btn" type="button">Mutatás</button>
       </div>
+
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>ID</th><th>Név</th><th>Kategória</th><th>Ár</th><th>Készlet</th><th>Szín</th><th>Dátum</th><th>Kosár</th>
+              <th>ID</th>
+              <th>Név</th>
+              <th>Kategória</th>
+              <th>Ár</th>
+              <th>Készlet</th>
+              <th>Szín</th>
+              <th>Dátum</th>
+              <th>Kosár</th>
             </tr>
           </thead>
           <tbody>
+            <tr *ngIf="loading">
+              <td colspan="8" class="empty-row">Betöltés...</td>
+            </tr>
+
+            <tr *ngIf="!loading && items.length === 0">
+              <td colspan="8" class="empty-row">Nincs megjeleníthető termék.</td>
+            </tr>
+
             <tr *ngFor="let item of items">
               <td>{{ item._id?.slice(-4) || '-' }}</td>
               <td>
@@ -29,11 +47,20 @@
               <td>{{ item.category }}</td>
               <td>{{ item.priceGross | currency:'HUF':'symbol':'1.0-0':'hu' }}</td>
               <td>{{ item.quantity }}</td>
-              <td><span class="swatch" [style.background]="item.color || '#111827'"></span> {{ item.color || '-' }}</td>
+              <td>
+                <span class="swatch" [style.background]="item.color || '#111827'"></span>
+                {{ item.color || '-' }}
+              </td>
               <td>{{ item.date || '-' }}</td>
               <td>
                 <div class="cart-actions">
-                  <input class="qty-input" type="number" min="1" [(ngModel)]="quantities[item._id || item.sku]">
+                  <input
+                    class="qty-input"
+                    type="number"
+                    min="1"
+                    [max]="item.quantity"
+                    [(ngModel)]="quantities[item._id || item.sku]"
+                  />
                   <button class="add-btn" type="button" (click)="addToCart(item)">Kosárba</button>
                 </div>
               </td>
@@ -45,13 +72,23 @@
 
     <mat-card class="card cart-card">
       <div class="panel-head">
-        <h2>Kosár</h2>
-        <button class="ghost-btn" type="button" (click)="clearCart()">Kosár ürítése</button>
+        <h2>Kosár <span class="cart-count">({{ cartItemCount }} db)</span></h2>
+        <button type="button" class="ghost-btn" (click)="clearCart()" *ngIf="cart.length">
+          Kosár ürítése
+        </button>
       </div>
+
       <div class="table-wrap">
         <table>
           <thead>
-            <tr><th>#</th><th>Név</th><th>Egységár</th><th>Menny.</th><th>Összesen</th><th>Művelet</th></tr>
+            <tr>
+              <th>#</th>
+              <th>Név</th>
+              <th>Egységár</th>
+              <th>Menny.</th>
+              <th>Összesen</th>
+              <th>Művelet</th>
+            </tr>
           </thead>
           <tbody>
             <tr *ngFor="let row of cart; let i = index">
@@ -60,9 +97,18 @@
               <td>{{ row.item.priceGross | currency:'HUF':'symbol':'1.0-0':'hu' }}</td>
               <td>{{ row.qty }}</td>
               <td>{{ row.item.priceGross * row.qty | currency:'HUF':'symbol':'1.0-0':'hu' }}</td>
-              <td><button class="ghost-btn" type="button" (click)="removeFromCart(row.item)">Törlés</button></td>
+              <td>
+                <div class="qty-stepper">
+                  <button type="button" class="step-btn" (click)="increaseQty(row)">+</button>
+                  <span class="qty-pill">{{ row.qty }}</span>
+                  <button type="button" class="step-btn" (click)="decreaseQty(row)">−</button>
+                </div>
+              </td>
             </tr>
-            <tr *ngIf="cart.length === 0"><td colspan="6" class="empty-row">A kosár üres.</td></tr>
+
+            <tr *ngIf="cart.length === 0">
+              <td colspan="6" class="empty-row">A kosár üres.</td>
+            </tr>
           </tbody>
         </table>
       </div>
@@ -72,26 +118,185 @@
   <div class="right-col">
     <mat-card class="card form-box">
       <h2>Vevő / Szállítás</h2>
+
       <div class="form-grid">
-        <div class="field"><label>Teljes név</label><input class="ui-input" placeholder="Vezetéknév Keresztnév"></div>
-        <div class="field"><label>Email</label><input class="ui-input" placeholder="nev@example.com"></div>
-        <div class="field"><label>Telefon</label><input class="ui-input" placeholder="+36..."></div>
-        <div class="field"><label>Cím</label><input class="ui-input" placeholder="Irányítószám, Város, Utca"></div>
-        <div class="field inline-two">
-          <div><label>Szállítás</label><select class="ui-input"><option>Személyes</option><option>Futár</option></select></div>
-          <div><label>Fizetés</label><select class="ui-input"><option>Utánvét</option><option>Átutalás</option></select></div>
+        <div class="field">
+          <label>Teljes név</label>
+          <input
+              class="ui-input"
+              [class.invalid]="isRequiredInvalid(customerName)"
+              placeholder="Vezetéknév Keresztnév"
+              [(ngModel)]="customerName"
+            />
         </div>
-        <div class="field"><label>Megjegyzés</label><textarea class="ui-input ui-textarea" placeholder="Egyéb információ a rendeléshez..."></textarea></div>
+
+        <div class="field">
+          <label>Email</label>
+          <input
+            class="ui-input"
+            [class.invalid]="isRequiredInvalid(email) || (!!email.trim() && !isEmailValid())"
+            placeholder="nev@example.com"
+            [(ngModel)]="email"
+          />
+        </div>
+
+        <div class="field">
+          <label>Telefon</label>
+          <input
+            class="ui-input"
+            [class.invalid]="isRequiredInvalid(phone) || (!!phone.trim() && !isPhoneValid())"
+            placeholder="+36..."
+            [(ngModel)]="phone"
+          />
+        </div>
+
+        <div class="field">
+          <label>Cím</label>
+          <input
+            class="ui-input"
+            [class.invalid]="isRequiredInvalid(address)"
+            placeholder="Irányítószám, Város, Utca"
+            [(ngModel)]="address"
+          />
+        </div>
+
+        <div class="field inline-two">
+          <div>
+            <label>Szállítás</label>
+            <select class="ui-input" [(ngModel)]="shippingMethod">
+              <option>Személyes</option>
+              <option>Futár</option>
+            </select>
+          </div>
+
+          <div>
+            <label>Fizetés</label>
+            <select class="ui-input" [(ngModel)]="paymentMethod">
+              <option>Utánvét</option>
+              <option>Átutalás</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Megjegyzés</label>
+          <textarea
+            class="ui-input ui-textarea"
+            placeholder="Egyéb információ a rendeléshez..."
+            [(ngModel)]="note"
+          ></textarea>
+        </div>
       </div>
     </mat-card>
 
     <mat-card class="card summary-box">
       <h2>Összegzés</h2>
-      <div class="sum-row"><span>Kosár részösszeg:</span><strong>{{ subtotal | currency:'HUF':'symbol':'1.0-0':'hu' }}</strong></div>
-      <div class="sum-row"><span>Szállítás:</span><strong>{{ shipping | currency:'HUF':'symbol':'1.0-0':'hu' }}</strong></div>
-      <div class="sum-row"><span>ÁFA információ:</span><strong>Bruttó árak</strong></div>
-      <div class="sum-row total"><span>Fizetendő összesen:</span><strong>{{ grandTotal | currency:'HUF':'symbol':'1.0-0':'hu' }}</strong></div>
-      <button class="submit-btn" type="button">Rendelés leadása</button>
+
+      <div class="sum-row">
+        <span>Kosár részösszeg:</span>
+        <strong>{{ subtotal | currency:'HUF':'symbol':'1.0-0':'hu' }}</strong>
+      </div>
+
+      <div class="sum-row">
+        <span>Szállítás:</span>
+        <strong>{{ shipping | currency:'HUF':'symbol':'1.0-0':'hu' }}</strong>
+      </div>
+
+      <div class="sum-row">
+        <span>ÁFA információ:</span>
+        <strong>Bruttó árak</strong>
+      </div>
+
+      <div class="sum-row total">
+        <span>Fizetendő összesen:</span>
+        <strong>{{ grandTotal | currency:'HUF':'symbol':'1.0-0':'hu' }}</strong>
+      </div>
+
+      <div class="form-error" *ngIf="submitError">{{ submitError }}</div>
+
+      <button
+        class="submit-btn"
+        type="button"
+        [disabled]="!canSubmit"
+        (click)="submitOrder()"
+      >
+        {{ isSubmitting ? 'Rendelés küldése...' : 'Rendelés leadása' }}
+      </button>
     </mat-card>
   </div>
 </section>
+
+<div class="confirm-overlay" *ngIf="submitSuccess" (click)="closeSuccessModal()">
+  <div class="confirm-modal" (click)="$event.stopPropagation()">
+    <button class="confirm-close" type="button" (click)="closeSuccessModal()">×</button>
+
+    <div class="confirm-header">
+      <div class="confirm-icon">✓</div>
+      <div>
+        <p class="confirm-kicker">Sikeres művelet</p>
+        <h2>Rendelés sikeresen leadva</h2>
+        <p class="confirm-subtext">
+          A rendelés bekerült a rendszerbe, az adatok mentésre kerültek.
+        </p>
+      </div>
+    </div>
+
+    <div class="confirm-highlight">
+      <span>Fizetendő végösszeg</span>
+      <strong>{{ confirmedGrandTotal | currency:'HUF':'symbol':'1.0-0':'hu' }}</strong>
+    </div>
+
+    <div class="confirm-grid fancy-grid">
+      <div class="confirm-item">
+        <span class="label">Rendelés azonosító</span>
+        <strong>{{ createdOrderId }}</strong>
+      </div>
+
+      <div class="confirm-item">
+        <span class="label">Dátum</span>
+        <strong>{{ createdAt | date:'yyyy.MM.dd HH:mm' }}</strong>
+      </div>
+
+      <div class="confirm-item">
+        <span class="label">Vevő</span>
+        <strong>{{ confirmedCustomerName || '—' }}</strong>
+      </div>
+
+      <div class="confirm-item">
+        <span class="label">Email</span>
+        <strong>{{ confirmedEmail || '—' }}</strong>
+      </div>
+
+      <div class="confirm-item">
+        <span class="label">Telefon</span>
+        <strong>{{ confirmedPhone || '—' }}</strong>
+      </div>
+
+      <div class="confirm-item">
+        <span class="label">Szállítás</span>
+        <strong>{{ confirmedShippingMethod }}</strong>
+      </div>
+
+      <div class="confirm-item">
+        <span class="label">Fizetés</span>
+        <strong>{{ confirmedPaymentMethod }}</strong>
+      </div>
+
+      <div class="confirm-item confirm-item--wide">
+        <span class="label">Cím</span>
+        <strong>{{ confirmedAddress || '—' }}</strong>
+      </div>
+
+      <div class="confirm-item confirm-item--wide" *ngIf="confirmedNote">
+        <span class="label">Megjegyzés</span>
+        <strong>{{ confirmedNote }}</strong>
+      </div>
+    </div>
+
+    <div class="confirm-actions">
+      <button class="submit-btn confirm-btn" type="button" (click)="closeSuccessModal()">
+        Rendben
+      </button>
+    </div>
+  </div>
+</div>

@@ -124,7 +124,15 @@
           <td>{{ item.category }}</td>
           <td>{{ item.sku }}</td>
           <td>{{ item.priceGross | currency:'HUF':'symbol':'1.0-0':'hu' }}</td>
-          <td>{{ item.quantity }}</td>
+          <td>
+            <span class="stock-value" [class.low-stock]="isLowStock(item)">
+              {{ item.quantity }}
+            </span>
+
+            <span class="low-stock-badge" *ngIf="isLowStock(item)">
+              Alacsony készlet
+            </span>
+          </td>
         </tr>
 
         <tr *ngIf="!loading && filteredItems.length === 0">

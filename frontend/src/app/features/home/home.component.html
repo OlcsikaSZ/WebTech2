@@ -19,8 +19,9 @@
     </ul>
 
     <div class="actions-row">
-      <a class="ui-btn" routerLink="/tech">Termékek megtekintése</a>
-      <a class="ui-btn ghost" routerLink="/tech/new">Új IT termék</a>
+      <a class="ui-btn" routerLink="/order">Rendelés indítása</a>
+      <a class="ui-btn ghost" routerLink="/tech" *ngIf="auth.isAdmin()">Termékek megtekintése</a>
+      <a class="ui-btn ghost" routerLink="/tech/new" *ngIf="auth.isAdmin()">Új IT termék</a>
       <span class="status-pill"><span class="dot"></span> stabil</span>
     </div>
   </mat-card>
@@ -39,18 +40,25 @@
   </mat-card>
 </section>
 
-<section class="metrics-grid">
+<section class="metrics-grid metrics-grid--four">
   <mat-card class="card metric">
     <div class="num">{{ items().length }}</div>
     <div class="label">Összes IT tétel</div>
   </mat-card>
+
   <mat-card class="card metric">
-    <div class="num">{{ totalQty() }}</div>
-    <div class="label">Raktáron</div>
+    <div class="num">{{ totalOrders() }}</div>
+    <div class="label">Rendelések száma</div>
   </mat-card>
+
   <mat-card class="card metric">
     <div class="num">{{ totalValue() | currency:'HUF':'symbol':'1.0-0':'hu' }}</div>
-    <div class="label">Készletérték (bruttó)</div>
+    <div class="label">Készletérték</div>
+  </mat-card>
+
+  <mat-card class="card metric">
+    <div class="num">{{ lowStockCount() }}</div>
+    <div class="label">Kevés készletes termék</div>
   </mat-card>
 </section>
 

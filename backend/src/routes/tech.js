@@ -1,18 +1,23 @@
 const express = require('express');
 const { body, validationResult } = require('express-validator');
 const TechItem = require('../models/TechItem');
-const auth = require('../middleware/auth');
+const { auth, requireRole } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.get('/', auth, async (req, res) => {
-  const items = await TechItem.find().sort({ createdAt: -1 });
-  res.json(items);
+router.get('/', auth, async (req, res, next) => {
+  try {
+    const items = await TechItem.find().sort({ createdAt: -1 }).lean();
+    res.json(items);
+  } catch (err) {
+    next(err);
+  }
 });
 
 router.post(
   '/',
   auth,
+  requireRole('admin'),
   [
     body('name').isString().trim().isLength({ min: 2 }),
     body('category').isString().trim().notEmpty(),

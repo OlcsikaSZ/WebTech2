@@ -1,7 +1,8 @@
-import { Component, ChangeDetectorRef, inject, NgZone, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { NgFor, NgIf, CurrencyPipe } from '@angular/common';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
 import { TechItem } from '../../core/tech.service';
 
@@ -15,7 +16,7 @@ import { TechItem } from '../../core/tech.service';
 export class TechListComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
-  private zone = inject(NgZone);
+  private destroyRef = inject(DestroyRef);
 
   loading = true;
 
@@ -36,33 +37,35 @@ export class TechListComponent implements OnInit {
   colorText = new FormControl<string>('', { nonNullable: true });
 
   ngOnInit(): void {
-    this.route.data.subscribe((data) => {
-      this.zone.run(() => {
-        this.loading = true;
+    this.setItems((this.route.snapshot.data['items'] ?? []) as TechItem[]);
 
-        const items = (data['items'] ?? []) as TechItem[];
-        this.items = items;
-        this.categories = Array.from(
-          new Set(items.map((x) => (x.category || '').trim()).filter(Boolean))
-        ).sort((a, b) => a.localeCompare(b));
-
-        this.applyFilters();
-
+    this.route.data
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((data) => {
+        this.setItems((data['items'] ?? []) as TechItem[]);
         this.loading = false;
         this.cdr.detectChanges();
       });
-    });
 
-    this.search.valueChanges.subscribe(() => this.applyFilters());
-    this.priceMin.valueChanges.subscribe(() => this.applyFilters());
-    this.priceMax.valueChanges.subscribe(() => this.applyFilters());
-    this.qtyMin.valueChanges.subscribe(() => this.applyFilters());
-    this.qtyMax.valueChanges.subscribe(() => this.applyFilters());
-    this.dateFrom.valueChanges.subscribe(() => this.applyFilters());
-    this.dateTo.valueChanges.subscribe(() => this.applyFilters());
-    this.skuContains.valueChanges.subscribe(() => this.applyFilters());
-    this.tagText.valueChanges.subscribe(() => this.applyFilters());
-    this.colorText.valueChanges.subscribe(() => this.applyFilters());
+    this.search.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.applyFilters());
+    this.priceMin.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.applyFilters());
+    this.priceMax.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.applyFilters());
+    this.qtyMin.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.applyFilters());
+    this.qtyMax.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.applyFilters());
+    this.dateFrom.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.applyFilters());
+    this.dateTo.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.applyFilters());
+    this.skuContains.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.applyFilters());
+    this.tagText.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.applyFilters());
+    this.colorText.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.applyFilters());
+  }
+
+  private setItems(items: TechItem[]): void {
+    this.items = items;
+    this.categories = Array.from(
+      new Set(items.map((x) => (x.category || '').trim()).filter(Boolean))
+    ).sort((a, b) => a.localeCompare(b));
+
+    this.applyFilters();
   }
 
   applyFilters(): void {
@@ -117,8 +120,6 @@ export class TechListComponent implements OnInit {
 
       return true;
     });
-
-    this.cdr.detectChanges();
   }
 
   get totalValue(): number {
@@ -129,9 +130,9 @@ export class TechListComponent implements OnInit {
   }
 
   get lowCount(): number {
-    return this.filteredItems.filter((item) => Number(item.quantity || 0) <= 1).length;
+    return this.filteredItems.filter((item) => this.isLowStock(item)).length;
   }
-
+  
   toggleCategory(cat: string): void {
     if (this.selectedCategories.includes(cat)) {
       this.selectedCategories = this.selectedCategories.filter((x) => x !== cat);
@@ -144,6 +145,10 @@ export class TechListComponent implements OnInit {
 
   isCategoryActive(cat: string): boolean {
     return this.selectedCategories.includes(cat);
+  }
+
+  isLowStock(item: TechItem): boolean {
+    return Number(item.quantity || 0) <= Number(item.reorder || 0);
   }
 
   clearFilters(): void {
