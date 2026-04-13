@@ -1,41 +1,40 @@
-<section class="hero-grid">
-  <mat-card class="card hero-copy">
-    <h1>Informatikai terméknyilvántartó</h1>
-    <p class="muted lead">
-      Egy modern, moduláris rendszer kifejezetten <strong>IT eszközök</strong> kezeléséhez:
-      notebookok, GPU-k, CPU-k, tárolók és perifériák. Reszponzív felület, gyors szűrés,
-      és barátságos űrlapvalidáció.
-    </p>
+<section class="hero-shop">
+  <mat-card class="card hero-banner">
+    <div class="hero-content">
+      <div class="hero-text">
+        <span class="eyebrow">TechNyilvántartó rendszer</span>
+        <h1>IT eszközök kezelése gyorsan, átláthatóan, felesleges sallang nélkül</h1>
+        <p class="muted lead">
+          Kezeld a készletet, kövesd a rendeléseket, vegyél fel új termékeket és tarts rendet
+          a teljes informatikai állományban. Olyan, mint egy webshop admin felület és egy
+          nyilvántartó rendszer szerelemgyereke.
+        </p>
 
-    <div class="chips" aria-label="Kiemelt kategóriák">
-      <span class="chip" *ngFor="let chip of chips" [attr.data-kind]="chip.kind">{{ chip.label }}</span>
-    </div>
+        <div class="hero-points">
+          <span class="chip" *ngFor="let chip of chips" [attr.data-kind]="chip.kind">{{ chip.label }}</span>
+        </div>
 
-    <ul class="feature-list">
-      <li>Listázás és keresés specifikusan IT termékekre</li>
-      <li>Új tétel felvitele validációval</li>
-      <li>MongoDB alapú adattárolás és gyors API</li>
-      <li>Letisztult, tech-hangulatú UI</li>
-    </ul>
+        <div class="actions-row">
+          <a class="ui-btn" routerLink="/order">Rendelés indítása</a>
+          <a class="ui-btn ghost" routerLink="/tech" *ngIf="auth.isAdmin()">Termékek kezelése</a>
+          <a class="ui-btn ghost" routerLink="/tech/new" *ngIf="auth.isAdmin()">Új termék felvitele</a>
+        </div>
+      </div>
 
-    <div class="actions-row">
-      <a class="ui-btn" routerLink="/order">Rendelés indítása</a>
-      <a class="ui-btn ghost" routerLink="/tech" *ngIf="auth.isAdmin()">Termékek megtekintése</a>
-      <a class="ui-btn ghost" routerLink="/tech/new" *ngIf="auth.isAdmin()">Új IT termék</a>
-      <span class="status-pill"><span class="dot"></span> stabil</span>
-    </div>
-  </mat-card>
-
-  <mat-card class="card hero-video">
-    <div class="video-shell"></div>
-    <div class="video-controls">
-      <button type="button" class="icon-btn">▶</button>
-      <button type="button" class="icon-btn ghost">🔇</button>
-      <div class="range"></div>
-      <div class="time">0:00 / 0:34</div>
-      <button type="button" class="icon-btn ghost wide">0.75x</button>
-      <button type="button" class="icon-btn ghost wide">1.25x</button>
-      <button type="button" class="icon-btn ghost">↻</button>
+      <div class="hero-side">
+        <div class="hero-stat">
+          <div class="value">{{ items().length }}</div>
+          <div class="label">Nyilvántartott termék</div>
+        </div>
+        <div class="hero-stat">
+          <div class="value">{{ totalOrders() }}</div>
+          <div class="label">Leadott rendelés</div>
+        </div>
+        <div class="hero-stat">
+          <div class="value">{{ lowStockCount() }}</div>
+          <div class="label">Alacsony készlet</div>
+        </div>
+      </div>
     </div>
   </mat-card>
 </section>
@@ -64,30 +63,59 @@
 
 <section class="mini-grid">
   <mat-card class="card info-box">
-    <h3>HTML elemek</h3>
-    <p>Használt tag-ek: div, span, p, címsorok, képek, táblázat, linkek, űrlap elemek, listák.</p>
+    <h3>Gyors termékkezelés</h3>
+    <p>Új tételek felvitele, meglévők listázása, később pedig szerkesztése ugyanazon a modern felületen.</p>
   </mat-card>
   <mat-card class="card info-box">
-    <h3>CSS formázások</h3>
-    <p>Külső CSS, sötét, tech-es design, üveg-szerű panelek, chipek, animált hoverek.</p>
+    <h3>Átlátható készlet</h3>
+    <p>Ár, SKU, készlet, kategória, címkék és további adatok egy helyen, gyors szűrőkkel.</p>
   </mat-card>
   <mat-card class="card info-box">
-    <h3>Angular + Material</h3>
-    <p>Űrlap ellenőrzés, táblázat, szűrés, route-ok és API integráció egy modernebb köntösben.</p>
+    <h3>Webshop hangulatú admin</h3>
+    <p>Nem egy száraz tanórai táblázat, hanem egy tényleg használható, vizuálisan egységes kezelőfelület.</p>
   </mat-card>
 </section>
 
 <mat-card class="card sample-table">
-  <h3>Minta táblázat</h3>
+  <div class="section-head">
+    <div>
+      <h3>Kiemelt termékek</h3>
+      <p class="muted">Az első néhány rögzített tétel a nyilvántartásból.</p>
+    </div>
+  </div>
+
   <table>
     <thead>
-      <tr><th>#</th><th>Modell</th><th>Kategória</th></tr>
+      <tr>
+        <th>#</th>
+        <th>Termék</th>
+        <th>Kategória</th>
+        <th>Bruttó ár</th>
+        <th>Készlet</th>
+      </tr>
     </thead>
     <tbody>
-      <tr *ngIf="items().length === 0"><td>1</td><td>NVIDIA GeForce RTX 4070</td><td>GPU</td></tr>
-      <tr *ngIf="items().length === 0"><td>2</td><td>AMD Ryzen 7 7800X3D</td><td>CPU</td></tr>
-      <tr *ngFor="let item of items().slice(0, 5); let i = index"><td>{{ i + 1 }}</td><td>{{ item.name }}</td><td>{{ item.category }}</td></tr>
+      <tr *ngIf="items().length === 0">
+        <td>1</td>
+        <td>NVIDIA GeForce RTX 4070</td>
+        <td>GPU</td>
+        <td>269 900 Ft</td>
+        <td>5</td>
+      </tr>
+      <tr *ngIf="items().length === 0">
+        <td>2</td>
+        <td>AMD Ryzen 7 7800X3D</td>
+        <td>CPU</td>
+        <td>159 900 Ft</td>
+        <td>8</td>
+      </tr>
+      <tr *ngFor="let item of items().slice(0, 5); let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ item.name }}</td>
+        <td>{{ item.category }}</td>
+        <td>{{ item.priceGross | currency:'HUF':'symbol':'1.0-0':'hu' }}</td>
+        <td>{{ item.quantity }}</td>
+      </tr>
     </tbody>
   </table>
-  <div class="footer-note">Készítette: Gál Olivér István (ISXBF3) · Angular + Material változat</div>
 </mat-card>

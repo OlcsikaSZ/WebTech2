@@ -45,6 +45,11 @@ export const routes: Routes = [
     canActivate: [adminGuard],
   },
   {
+    path: 'tech/:id/edit',
+    component: TechAddComponent,
+    canActivate: [adminGuard],
+  },
+  {
     path: 'order',
     component: OrderComponent,
     canActivate: [authGuard],

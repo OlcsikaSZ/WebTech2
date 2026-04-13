@@ -14,6 +14,18 @@ router.get('/', auth, async (req, res, next) => {
   }
 });
 
+router.get('/:id', auth, async (req, res, next) => {
+  try {
+    const item = await TechItem.findById(req.params.id).lean();
+    if (!item) {
+      return res.status(404).json({ message: 'A termék nem található.' });
+    }
+    res.json(item);
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post(
   '/',
   auth,
@@ -26,7 +38,6 @@ router.post(
     body('priceNet').isNumeric(),
     body('vat').isNumeric(),
     body('quantity').isInt({ min: 0 }),
-    body('imageUrl').optional().isString(),
     body('color').optional().isString(),
     body('date').optional().isString(),
     body('tags').optional().isArray(),
@@ -66,5 +77,96 @@ router.post(
     return res.status(201).json(created);
   }
 );
+
+router.put(
+  '/:id',
+  auth,
+  requireRole('admin'),
+  [
+    body('name').isString().trim().isLength({ min: 2 }),
+    body('category').isString().trim().notEmpty(),
+    body('sku').isString().trim().isLength({ min: 2 }),
+    body('priceGross').isNumeric(),
+    body('priceNet').isNumeric(),
+    body('vat').isNumeric(),
+    body('quantity').isInt({ min: 0 }),
+    body('color').optional().isString(),
+    body('date').optional().isString(),
+    body('tags').optional().isArray(),
+    body('brand').optional().isString(),
+    body('description').optional().isString(),
+    body('location').optional().isString(),
+    body('condition').optional().isString(),
+    body('status').optional().isString(),
+    body('reorder').optional().isNumeric(),
+    body('warrantyMonths').optional().isNumeric(),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+    const data = req.body;
+
+    const item = await TechItem.findById(req.params.id);
+    if (!item) {
+      return res.status(404).json({ message: 'A termék nem található.' });
+    }
+
+    const exists = await TechItem.findOne({
+      sku: data.sku,
+      _id: { $ne: req.params.id }
+    });
+
+    if (exists) {
+      return res.status(409).json({ message: 'Már létezik másik termék ezzel az SKU-val.' });
+    }
+
+    if (Number(data.vat) < 0 || Number(data.vat) > 100) {
+      return res.status(400).json({ message: 'ÁFA (vat) 0 és 100 között legyen.' });
+    }
+
+    if (Number(data.priceNet) > Number(data.priceGross)) {
+      return res.status(400).json({ message: 'Nettó ár nem lehet nagyobb a bruttónál.' });
+    }
+
+    item.name = data.name;
+    item.category = data.category;
+    item.sku = data.sku;
+    item.priceGross = Number(data.priceGross);
+    item.priceNet = Number(data.priceNet);
+    item.vat = Number(data.vat);
+    item.quantity = Number(data.quantity);
+    item.color = data.color || '';
+    item.tags = Array.isArray(data.tags) ? data.tags : [];
+    item.date = data.date || '';
+    item.brand = data.brand || '';
+    item.description = data.description || '';
+    item.location = data.location || '';
+    item.condition = data.condition || 'uj';
+    item.status = data.status || 'Aktív';
+    item.reorder = Number(data.reorder || 0);
+    item.warrantyMonths = Number(data.warrantyMonths || 24);
+
+    await item.save();
+
+    return res.json(item);
+  }
+);
+
+router.delete('/:id', auth, requireRole('admin'), async (req, res, next) => {
+  try {
+    const item = await TechItem.findById(req.params.id);
+
+    if (!item) {
+      return res.status(404).json({ message: 'A termék nem található.' });
+    }
+
+    await TechItem.findByIdAndDelete(req.params.id);
+
+    return res.json({ message: 'A termék sikeresen törölve lett.' });
+  } catch (err) {
+    next(err);
+  }
+});
 
 module.exports = router;

@@ -284,11 +284,11 @@ cd WebTech2
 ```
 
 ### 2. MongoDB indítása
-A backend helyi MongoDB-re csatlakozik.  
+A backend MongoDB Atlas-ra csatlakozik.  
 Alapértelmezett kapcsolat:
 
 ```env
-MONGO_URI=mongodb://127.0.0.1:27017/tech-nyilvantarto
+MONGO_URI=mongodb+srv://webtechadmin:Webtech2026Mongo@webtech2-cluster.nmjglsm.mongodb.net/tech-nyilvantarto?retryWrites=true&w=majority&appName=webtech2-cluster
 ```
 
 Ha a MongoDB nincs szolgáltatásként telepítve, kézzel is elindítható például:
@@ -338,7 +338,7 @@ A backend `.env` fájlja például így néz ki:
 
 ```env
 PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/tech-nyilvantarto
+MONGO_URI=mongodb+srv://webtechadmin:Webtech2026Mongo@webtech2-cluster.nmjglsm.mongodb.net/tech-nyilvantarto?retryWrites=true&w=majority&appName=webtech2-cluster
 JWT_SECRET=please-change-me
 JWT_EXPIRES_IN=2h
 ```
@@ -346,7 +346,7 @@ JWT_EXPIRES_IN=2h
 ### Ajánlott `.env.example`
 ```env
 PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/tech-nyilvantarto
+MONGO_URI=mongodb+srv://webtechadmin:JELSZÓ@webtech2-cluster.nmjglsm.mongodb.net/tech-nyilvantarto?retryWrites=true&w=majority&appName=webtech2-cluster
 JWT_SECRET=your-secret-here
 JWT_EXPIRES_IN=2h
 ```

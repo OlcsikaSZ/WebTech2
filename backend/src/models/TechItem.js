@@ -10,7 +10,6 @@ const TechItemSchema = new mongoose.Schema(
     vat: { type: Number, required: true, min: 0, max: 100 },
     quantity: { type: Number, required: true, min: 0 },
     color: { type: String, default: '' },
-    imageUrl: { type: String, default: '' },
     tags: [{ type: String }],
     date: { type: String, default: '' },
     brand: { type: String, default: '' },

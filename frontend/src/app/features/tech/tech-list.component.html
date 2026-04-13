@@ -109,6 +109,7 @@
           <th>SKU</th>
           <th>Bruttó (Ft)</th>
           <th>Készlet</th>
+          <th class="actions-col">Művelet</th>
         </tr>
       </thead>
       <tbody>
@@ -133,10 +134,16 @@
               Alacsony készlet
             </span>
           </td>
+          <td class="actions-col">
+            <a class="table-action-btn" [routerLink]="['/tech', item._id, 'edit']">
+              Szerkesztés
+            </a>
+            <button type="button" class="table-delete-btn" (click)="deleteItem(item)">Törlés</button>
+          </td>
         </tr>
 
         <tr *ngIf="!loading && filteredItems.length === 0">
-          <td colspan="5" class="empty-row">Nincs találat. Próbálj másik keresést vagy szűrést.</td>
+          <td colspan="6" class="empty-row">Nincs találat. Próbálj másik keresést vagy szűrést.</td>
         </tr>
       </tbody>
     </table>

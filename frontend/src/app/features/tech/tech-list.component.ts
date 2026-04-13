@@ -4,12 +4,14 @@ import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatCardModule } from '@angular/material/card';
-import { TechItem } from '../../core/tech.service';
+import { TechItem, TechService } from '../../core/tech.service';
+import { RouterLink } from '@angular/router';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-tech-list',
   standalone: true,
-  imports: [NgIf, NgFor, ReactiveFormsModule, MatCardModule, CurrencyPipe],
+  imports: [NgIf, NgFor, ReactiveFormsModule, MatCardModule, CurrencyPipe, RouterLink, MatSnackBarModule],
   templateUrl: './tech-list.component.html',
   styleUrls: ['./tech-list.component.scss'],
 })
@@ -17,6 +19,8 @@ export class TechListComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private cdr = inject(ChangeDetectorRef);
   private destroyRef = inject(DestroyRef);
+  private snack = inject(MatSnackBar);
+  private tech = inject(TechService);
 
   loading = true;
 
@@ -66,6 +70,27 @@ export class TechListComponent implements OnInit {
     ).sort((a, b) => a.localeCompare(b));
 
     this.applyFilters();
+  }
+
+  private loadItems(): void {
+    this.loading = true;
+
+    this.tech.list(true)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (items) => {
+          this.setItems(items);
+          this.loading = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.loading = false;
+          this.snack.open('A terméklista frissítése sikertelen volt.', 'OK', {
+            duration: 3000,
+            panelClass: ['app-snackbar-error']
+          });
+        }
+      });
   }
 
   applyFilters(): void {
@@ -151,6 +176,36 @@ export class TechListComponent implements OnInit {
     return Number(item.quantity || 0) <= Number(item.reorder || 0);
   }
 
+  deleteItem(item: TechItem): void {
+    if (!item?._id) return;
+
+    const confirmed = window.confirm(
+      `Biztosan törölni szeretnéd ezt a terméket?\n\n${item.name} (${item.sku})`
+    );
+
+    if (!confirmed) return;
+
+    this.tech.delete(item._id)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: () => {
+          this.snack.open('A termék sikeresen törölve lett.', 'OK', {
+            duration: 2500,
+            panelClass: ['app-snackbar-success']
+          });
+
+          this.loadItems();
+        },
+        error: (err) => {
+          const msg = err?.error?.message || 'A törlés sikertelen volt.';
+          this.snack.open(msg, 'OK', {
+            duration: 3000,
+            panelClass: ['app-snackbar-error']
+          });
+        }
+      });
+  }
+
   clearFilters(): void {
     this.search.setValue('');
     this.selectedCategories = [];
@@ -165,4 +220,5 @@ export class TechListComponent implements OnInit {
     this.colorText.setValue('');
     this.applyFilters();
   }
+
 }
