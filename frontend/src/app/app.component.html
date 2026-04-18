@@ -25,6 +25,7 @@
         mat-button
         routerLink="/tech"
         routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
         *ngIf="auth.isAdmin()"
       >
         IT termékek
@@ -34,6 +35,7 @@
         mat-button
         routerLink="/tech/new"
         routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
         class="nav-cta"
         *ngIf="auth.isAdmin()"
       >

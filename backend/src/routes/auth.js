@@ -54,12 +54,12 @@ router.post(
 
     const user = await User.findOne({ username });
     if (!user) {
-      return res.status(401).json({ message: "Bad credentials" });
+      return res.status(401).json({ message: "Hibás felhasználónév vagy jelszó." });
     }
 
     const ok = await bcrypt.compare(password, user.passwordHash);
     if (!ok) {
-      return res.status(401).json({ message: "Bad credentials" });
+      return res.status(401).json({ message: "Hibás felhasználónév vagy jelszó." });
     }
 
     const token = jwt.sign(

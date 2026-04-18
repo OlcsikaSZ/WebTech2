@@ -1,42 +1,47 @@
-<mat-card class="card">
+<mat-card class="card auth-card">
   <h2>Regisztráció</h2>
 
   <form [formGroup]="form" (ngSubmit)="submit()">
     <mat-form-field appearance="outline" class="full">
       <mat-label>Felhasználónév</mat-label>
       <input matInput formControlName="username" />
-      <mat-error *ngIf="form.controls.username.hasError('required')">
-        Kötelező
+      <mat-error *ngIf="form.controls.username.touched && form.controls.username.hasError('required')">
+        A felhasználónév megadása kötelező.
       </mat-error>
-      <mat-error *ngIf="form.controls.username.hasError('minlength')">
-        Minimum 3 karakter
+      <mat-error *ngIf="form.controls.username.touched && form.controls.username.hasError('minlength')">
+        Minimum 3 karakter szükséges.
       </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full">
       <mat-label>Jelszó</mat-label>
       <input matInput type="password" formControlName="password" />
-      <mat-error *ngIf="form.controls.password.hasError('required')">
-        Kötelező
+      <mat-error *ngIf="form.controls.password.touched && form.controls.password.hasError('required')">
+        A jelszó megadása kötelező.
       </mat-error>
-      <mat-error *ngIf="form.controls.password.hasError('minlength')">
-        Minimum 6 karakter
+      <mat-error *ngIf="form.controls.password.touched && form.controls.password.hasError('minlength')">
+        Minimum 6 karakter szükséges.
       </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full">
       <mat-label>Jelszó megerősítése</mat-label>
       <input matInput type="password" formControlName="confirmPassword" />
-      <mat-error *ngIf="form.controls.confirmPassword.hasError('required')">
-        Kötelező
-      </mat-error>
-      <mat-error *ngIf="form.hasError('passwordMismatch')">
-        A két jelszó nem egyezik
+      <mat-error *ngIf="form.controls.confirmPassword.touched && form.controls.confirmPassword.hasError('required')">
+        A jelszó megerősítése kötelező.
       </mat-error>
     </mat-form-field>
 
-    <button mat-raised-button color="primary" class="full" [disabled]="loading || form.invalid">
-      {{ loading ? 'Regisztrálunk…' : 'Regisztráció' }}
+    <div class="inline-error" *ngIf="registerError || (form.touched && form.hasError('passwordMismatch'))">
+      {{ registerError || 'A két jelszó nem egyezik.' }}
+    </div>
+
+    <button
+      type="submit"
+      class="ui-btn auth-btn"
+      [disabled]="loading"
+    >
+      {{ loading ? 'Regisztrálunk...' : 'Regisztráció' }}
     </button>
   </form>
 

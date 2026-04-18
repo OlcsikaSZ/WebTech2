@@ -1,7 +1,11 @@
 <section class="page-title-row">
   <div>
-    <h1>Új IT termék hozzáadása</h1>
-    <p class="muted">A korábbi beadandó struktúrájához igazított, részletesebb űrlap.</p>
+    <h1>{{ editMode ? 'IT termék módosítása' : 'Új IT termék hozzáadása' }}</h1>
+    <p class="muted">
+      {{ editMode
+        ? 'A kiválasztott termék adatai már betöltve jelennek meg, ezeket tudod módosítani.'
+        : 'A korábbi beadandó struktúrájához igazított, részletesebb űrlap.' }}
+    </p>
   </div>
 </section>
 
@@ -93,10 +97,6 @@
 
     <section class="form-section">
       <div class="grid-two">
-        <div class="field full">
-          <label>Kép URL (opcionális)</label>
-          <input class="ui-input" formControlName="imageUrl" placeholder="https://...">
-        </div>
         <div class="field">
           <label>Szín (HEX)</label>
           <input class="ui-input" formControlName="color" placeholder="#2563eb">
@@ -114,7 +114,9 @@
     </section>
 
     <div class="actions-row end">
-      <button class="ui-btn" type="submit">Mentés</button>
+      <button class="ui-btn" type="submit">
+        {{ editMode ? 'Módosítás mentése' : 'Mentés' }}
+      </button>
     </div>
   </form>
 </mat-card>

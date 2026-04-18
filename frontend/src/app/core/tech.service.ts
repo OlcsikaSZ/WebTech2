@@ -13,7 +13,6 @@ export interface TechItem {
   vat: number;
   quantity: number;
   color?: string;
-  imageUrl?: string;
   tags?: string[];
   date?: string;
   brand?: string;
@@ -41,15 +40,29 @@ export class TechService {
     return this.itemsCache$;
   }
 
+  getById(id: string) {
+    return this.http.get<TechItem>(`${environment.apiBaseUrl}/tech/${id}`);
+  }
+
   clearCache(): void {
     this.itemsCache$ = undefined;
   }
 
   create(item: TechItem) {
-    return this.http
-      .post<TechItem>(`${environment.apiBaseUrl}/tech`, item)
-      .pipe(
-        tap(() => this.clearCache())
-      );
+    return this.http.post<TechItem>(`${environment.apiBaseUrl}/tech`, item).pipe(
+      tap(() => this.clearCache())
+    );
+  }
+
+  update(id: string, item: TechItem) {
+    return this.http.put<TechItem>(`${environment.apiBaseUrl}/tech/${id}`, item).pipe(
+      tap(() => this.clearCache())
+    );
+  }
+
+  delete(id: string) {
+    return this.http.delete<{ message: string }>(`${environment.apiBaseUrl}/tech/${id}`).pipe(
+      tap(() => this.clearCache())
+    );
   }
 }

@@ -1,21 +1,34 @@
-<mat-card class="card">
+<mat-card class="card auth-card">
   <h2>Belépés</h2>
 
   <form [formGroup]="form" (ngSubmit)="submit()">
     <mat-form-field appearance="outline" class="full">
       <mat-label>Felhasználónév</mat-label>
       <input matInput formControlName="username" />
-      <mat-error *ngIf="form.controls.username.invalid">Kötelező</mat-error>
+      <mat-error *ngIf="form.controls.username.touched && form.controls.username.invalid">
+        A felhasználónév megadása kötelező.
+      </mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full">
       <mat-label>Jelszó</mat-label>
       <input matInput type="password" formControlName="password" />
-      <mat-error *ngIf="form.controls.password.invalid">Kötelező</mat-error>
+      <mat-error *ngIf="form.controls.password.touched && form.controls.password.invalid">
+        A jelszó megadása kötelező.
+      </mat-error>
     </mat-form-field>
 
-    <button mat-raised-button color="primary" class="full" [disabled]="loading || form.invalid">
-      {{ loading ? 'Beléptetünk…' : 'Belépés' }}
+    <div class="inline-error" *ngIf="loginError">
+      {{ loginError }}
+    </div>
+
+    <button
+      type="submit"
+      class="ui-btn auth-btn"
+      [class.is-loading]="loading"
+      [disabled]="loading"
+    >
+      {{ loading ? 'Beléptetünk...' : 'Belépés' }}
     </button>
   </form>
 
